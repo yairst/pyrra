@@ -787,6 +787,17 @@ This implementation plan breaks down the remaining work to complete the dynamic 
 
 **Note**: Task 7.13 already completed comprehensive regression testing with zero regressions found. These tasks are for final verification only.
 
+**IMPORTANT - Branch Workflow**:
+- **Current branch**: `dev-tools-and-docs` (has all .dev-docs, .kiro, cmd/, scripts/ for reference)
+- **PR branch**: `add-dynamic-burn-rate` (clean, ready for upstream - no dev files)
+- **Workflow**: 
+  1. Work on validation tasks in `dev-tools-and-docs` branch (access to all docs and tools)
+  2. If any core files need changes (slo/, ui/, proto/, etc.), commit them to BOTH branches:
+     - First commit to `dev-tools-and-docs` (current branch)
+     - Then cherry-pick to `add-dynamic-burn-rate`: `git checkout add-dynamic-burn-rate && git cherry-pick <commit-hash>`
+  3. Only core implementation files should be in PR branch (no .dev-docs, .kiro, cmd/, scripts/)
+  4. Final PR will be created from `add-dynamic-burn-rate` branch
+
 - [ ] 9. Perform final validation checks before upstream contribution
 
 - [ ] 9.1 Final regression verification
@@ -810,10 +821,15 @@ This implementation plan breaks down the remaining work to complete the dynamic 
   - **Documentation accuracy**: Verify all code comments and docs match implementation
   - **Go formatting**: Run `gofumpt` on all Go files
   - **TypeScript/React**: Verify UI code follows existing patterns
+  - **IMPORTANT**: If any core files are modified during this review:
+    - Commit changes to `dev-tools-and-docs` branch first
+    - Cherry-pick to `add-dynamic-burn-rate` branch: `git checkout add-dynamic-burn-rate && git cherry-pick <commit-hash>`
+    - Verify changes are in both branches before proceeding
   - _Requirements: 6.5_
 
 - [ ] 9.3 Final production validation
 
+  - **Branch**: Work in `dev-tools-and-docs` (has validation tools in cmd/)
   - **End-to-end smoke test**: Run complete workflow from SLO creation to alert firing
   - **Performance validation**: Verify performance meets expectations (reference Task 7.10 results)
   - **Error handling validation**: Test graceful degradation with missing metrics
@@ -826,14 +842,24 @@ This implementation plan breaks down the remaining work to complete the dynamic 
     - If not tested, document as known limitation in PR description
   - **Reference existing validation**: Leverage comprehensive testing from Tasks 1-7
   - **Quick checklist**: Use `.dev-docs/TASK_7.13_QUICK_CHECKLIST.md` for final verification
+  - **IMPORTANT**: If validation reveals bugs requiring code fixes:
+    - Fix in `dev-tools-and-docs` branch
+    - Cherry-pick fixes to `add-dynamic-burn-rate` branch
+    - Re-run tests in both branches to verify
   - _Requirements: 5.5, 6.5_
 
 - [ ] 9.4 Prepare for upstream submission
 
+  - **Switch to PR branch**: `git checkout add-dynamic-burn-rate`
+  - **Verify branch is clean**: Ensure no dev files (.dev-docs, .kiro, cmd/, scripts/) in PR branch
   - **Review commit history**: Check if commits need squashing/organizing for clean history
+  - **Final build verification**: 
+    - Run `go build -o pyrra .` (backend)
+    - Run `cd ui && npm run build` (frontend)
+    - Run `go test ./...` (all tests)
   - **Update CHANGELOG**: Add entry for dynamic burn rate feature (if Pyrra uses changelog)
   - **Version considerations**: Note any version compatibility requirements
-  - **Create PR branch**: Prepare clean branch for pull request from current feature branch
-  - **Final review checklist**: Complete pre-submission checklist
-  - **Backup development artifacts**: Ensure `dev-tools-and-docs` branch has all development files
+  - **Final review checklist**: Complete pre-submission checklist from `.dev-docs/UPSTREAM_CONTRIBUTION_PLAN.md`
+  - **Verify development artifacts**: Confirm `dev-tools-and-docs` branch has all development files preserved
+  - **Document branch strategy**: Note in PR description that development artifacts are in `dev-tools-and-docs` branch
   - _Requirements: 6.5_
