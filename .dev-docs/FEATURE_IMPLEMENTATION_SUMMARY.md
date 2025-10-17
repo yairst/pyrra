@@ -2223,3 +2223,82 @@ case 1: // Second warning window
 - Task 8.1: Fetch and merge from upstream
 - Task 8.2: Create dev-tools-and-docs branch
 - Task 8.4: Create PR description with test evidence
+
+
+## 🎯 **CURRENT STATUS: Task 8.6 Complete - Pull Request Description and Evidence**
+
+### **January 17, 2025 - Task 8.6 Implementation Session Results**
+
+**✅ COMPLETE SUCCESS: Comprehensive Pull Request Description and Evidence Compiled**
+
+#### **✅ Task 8.6 Complete**: Pull Request Description and Evidence
+
+- **PR Description Created**: Comprehensive pull request description with feature overview, motivation, and implementation summary
+- **Test Evidence Compiled**: Gathered and organized key testing results from all validation tasks
+- **Before/After Examples**: Created clear examples showing static vs dynamic behavior comparison
+- **Design Decisions Documented**: Explained key architectural choices and rationale
+- **Reviewer Questions Anticipated**: Prepared responses to common questions about performance, complexity, and testing
+- **Migration Guide Included**: Step-by-step instructions for enabling dynamic burn rates
+- **Examples Provided**: Referenced four comprehensive example configurations in examples/ directory
+
+#### **✅ Deliverable Created**:
+
+**Document**: `.dev-docs/TASK_8.6_PR_DESCRIPTION_AND_EVIDENCE.md`
+
+**Contents**:
+1. **Pull Request Title and Description**
+   - Feature overview and motivation
+   - Implementation summary (backend, API, UI)
+   - Testing evidence compilation
+   - Breaking changes (none - fully backward compatible)
+   - Migration guide
+
+2. **Test Evidence Compilation**
+   - Mathematical validation (Task 7.2) - All formulas verified correct
+   - Query optimization (Task 7.10) - 7.17x speedup for ratio, 2.20x for latency
+   - UI regression testing (Task 7.13) - Zero regressions found
+   - Alert firing validation (Task 6) - End-to-end pipeline validated
+   - Browser compatibility (Task 7.12) - Chrome and Firefox tested
+
+3. **Before/After Examples**
+   - Static vs dynamic threshold comparison with real numbers
+   - UI display comparison (list page, alerts table, tooltips)
+   - Alert rule comparison (PrometheusRule YAML)
+   - Clear demonstration of traffic-aware behavior
+
+4. **Design Decisions**
+   - Opt-in feature (not default) - Preserves existing behavior
+   - Multi-window consistency - Both windows use N_long for scaling
+   - Recording rules integration - Hybrid approach for optimization
+   - Latency indicator label selector - Critical `le=""` requirement
+   - Error handling strategy - Graceful degradation over crashes
+
+5. **Anticipated Reviewer Questions**
+   - Why dynamic burn rates? - Addresses false positive/negative issues
+   - Performance impact? - Actually improves performance (7x speedup)
+   - Complexity? - Opt-in feature, doesn't affect existing users
+   - Testing? - Comprehensive validation with multiple tools
+   - Maintenance? - Clean implementation following existing patterns
+
+6. **PR Submission Checklist**
+   - ✅ All tests passing
+   - ✅ UI builds successfully
+   - ✅ Code formatting applied
+   - ✅ Testing evidence compiled
+   - ✅ Documentation updated
+   - ✅ Backward compatibility verified
+   - ✅ Production readiness confirmed
+
+#### **✅ Production Readiness Confirmed**:
+
+- **Zero Breaking Changes**: Feature is completely opt-in and backward compatible
+- **Comprehensive Testing**: Mathematical validation, query optimization, UI regression testing, alert firing validation
+- **Performance Optimized**: 7x speedup for ratio indicators, 2x for latency
+- **Error Handling**: Graceful degradation for missing metrics
+- **Documentation Complete**: User-facing docs updated, comprehensive internal docs available
+
+**Status**: ✅ **TASK 8.6 COMPLETE - PULL REQUEST DESCRIPTION AND EVIDENCE READY FOR UPSTREAM SUBMISSION**
+
+---
+
+**Next Steps**: Task Group 9 - Final Validation and Quality Assurance before PR submission
