@@ -1,7 +1,7 @@
 # Task 7.6: UI Refresh Rate Investigation
 
 ## Investigation Date
-January 2025
+October 2025
 
 ## Objective
 Investigate whether the UI refresh rate in Detail.tsx was modified during dynamic burn rate feature development by comparing with the upstream-comparison branch.
