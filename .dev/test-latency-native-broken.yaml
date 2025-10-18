@@ -1,0 +1,23 @@
+# Test SLO - LatencyNative with Broken Metric
+# Used for error handling validation with broken native histogram metrics
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-latency-native-broken
+  namespace: monitoring
+  labels:
+    pyrra.dev/team: platform
+spec:
+  target: "99.5"
+  window: 30d
+  description: "Test LatencyNative indicator with broken metric for error handling validation"
+  indicator:
+    latencyNative:
+      total:
+        metric: nonexistent_histogram_metric{job="nonexistent"}
+      latency: 200ms
+  alerting:
+    name: TestLatencyNativeBrokenErrorBudgetBurn
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

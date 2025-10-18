@@ -1,0 +1,23 @@
+# Test SLO - Regex Selector with Grouping (Static)
+# Used for testing regex label selectors with grouping field (Task 8.4 investigation)
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-regex-static
+  namespace: monitoring
+  labels:
+    prometheus: k8s
+    pyrra.dev/team: operations
+    role: alert-rules
+spec:
+  target: "99"
+  window: 2w
+  description: "Test SLO with regex selector and static burn rate"
+  indicator:
+    ratio:
+      errors:
+        metric: prometheus_http_requests_total{handler=~"/api.*",code=~"5.."}
+      total:
+        metric: prometheus_http_requests_total{handler=~"/api.*"}
+      grouping:
+        - handler

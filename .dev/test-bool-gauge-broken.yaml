@@ -1,0 +1,21 @@
+# Test SLO - BoolGauge with Broken Metric
+# Used for error handling validation
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-bool-gauge-broken
+  namespace: monitoring
+  labels:
+    pyrra.dev/team: platform
+spec:
+  target: "99.0"
+  window: 30d
+  description: "Test BoolGauge indicator with broken metric for error handling validation"
+  indicator:
+    bool_gauge:
+      metric: nonexistent_probe_metric{job="nonexistent"}
+  alerting:
+    name: TestBoolGaugeBrokenErrorBudgetBurn
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

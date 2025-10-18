@@ -1,0 +1,26 @@
+# Test SLO - Broken Latency Metrics
+# Used for testing error handling with broken latency metrics
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-broken-latency
+  namespace: monitoring
+  labels:
+    app: error-testing
+    component: broken
+spec:
+  target: "95"
+  window: 30d
+  description: "Test SLO with broken metrics to test error handling"
+  indicator:
+    latency:
+      success:
+        metric: nonexistent_metric_bucket{le="0.1"}
+      total:
+        metric: nonexistent_metric_count
+  alerting:
+    name: TestBrokenLatency
+    burnRateType: dynamic
+    burnrates: true
+    absent: false
+    disabled: false

@@ -1,0 +1,26 @@
+# Test SLO - Static Burn Rate with Latency Indicator
+# Used for testing latency indicator with static burn rate (comparison baseline)
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-latency-static
+  namespace: monitoring
+  labels:
+    app: static-testing
+    component: prometheus
+spec:
+  target: "95"
+  window: 30d
+  description: "Test latency indicator with static burn rate - 95% of Prometheus requests under 100ms"
+  indicator:
+    latency:
+      success:
+        metric: prometheus_http_request_duration_seconds_bucket{job="prometheus-k8s",le="0.1"}
+      total:
+        metric: prometheus_http_request_duration_seconds_count{job="prometheus-k8s"}
+  alerting:
+    name: TestLatencyStatic
+    burnRateType: static
+    burnrates: true
+    absent: false
+    disabled: false

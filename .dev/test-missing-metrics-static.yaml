@@ -1,0 +1,22 @@
+# Test SLO - Missing Metrics (Static Ratio)
+# Used for testing error handling with completely non-existent metrics (static burn rate)
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-missing-metrics-static
+  namespace: default
+spec:
+  target: "99"
+  window: 30d
+  description: "Test SLO with completely non-existent metrics (static burn rate)"
+  indicator:
+    ratio:
+      errors:
+        metric: completely_fictional_error_metric_that_does_not_exist
+      total:
+        metric: completely_fictional_total_metric_that_does_not_exist
+  alerting:
+    name: test-missing-metrics-static
+    burnRateType: static
+    burnrates: true
+    absent: true

@@ -1,0 +1,19 @@
+# Test SLO - Missing Metrics (BoolGauge)
+# Used for testing error handling with non-existent metrics
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-missing-bool-gauge
+  namespace: default
+spec:
+  target: "99"
+  window: 30d
+  description: "Test BoolGauge SLO with non-existent probe metric"
+  indicator:
+    bool_gauge:
+      metric: fictional_probe_metric_does_not_exist
+  alerting:
+    name: test-missing-bool-gauge
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

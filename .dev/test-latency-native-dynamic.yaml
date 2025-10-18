@@ -1,0 +1,23 @@
+# Test SLO - LatencyNative with Dynamic Burn Rate
+# Used for testing LatencyNative indicator with dynamic burn rate
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-latency-native-dynamic
+  namespace: monitoring
+  labels:
+    pyrra.dev/team: platform
+spec:
+  target: "99.5"
+  window: 30d
+  description: "Test LatencyNative indicator with dynamic burn rate using Pyrra connect metrics"
+  indicator:
+    latencyNative:
+      total:
+        metric: connect_server_requests_duration_seconds{job="pyrra-external"}
+      latency: 200ms
+  alerting:
+    name: TestLatencyNativeDynamicErrorBudgetBurn
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

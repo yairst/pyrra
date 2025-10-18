@@ -1,0 +1,25 @@
+# Test SLO - Static Burn Rate with Apiserver Metrics
+# Used for testing static burn rate comparison with apiserver metrics
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-static-apiserver
+  namespace: monitoring
+  labels:
+    app: static-testing
+    component: apiserver
+spec:
+  target: "95"
+  window: 30d
+  description: "Static burn rate test SLO using apiserver requests - GET operations"
+  indicator:
+    ratio:
+      errors:
+        metric: apiserver_request_total{verb="GET",code=~"4..|5.."}
+      total:
+        metric: apiserver_request_total{verb="GET"}
+  alerting:
+    name: TestStaticApiserver
+    burnRateType: static
+    burnrates: true
+    absent: true

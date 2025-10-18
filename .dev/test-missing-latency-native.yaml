@@ -1,0 +1,21 @@
+# Test SLO - Missing Metrics (LatencyNative)
+# Used for testing error handling with non-existent native histogram metrics
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-missing-latency-native
+  namespace: default
+spec:
+  target: "99"
+  window: 30d
+  description: "Test LatencyNative SLO with non-existent native histogram metric"
+  indicator:
+    latencyNative:
+      total:
+        metric: fictional_native_histogram_metric
+      latency: 100ms
+  alerting:
+    name: test-missing-latency-native
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

@@ -1,0 +1,22 @@
+# Test SLO - Missing Metrics (Dynamic Ratio)
+# Used for testing error handling with completely non-existent metrics (dynamic burn rate)
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-missing-metrics-dynamic
+  namespace: default
+spec:
+  target: "99"
+  window: 30d
+  description: "Test SLO with completely non-existent metrics (dynamic burn rate)"
+  indicator:
+    ratio:
+      errors:
+        metric: completely_fictional_error_metric_dynamic
+      total:
+        metric: completely_fictional_total_metric_dynamic
+  alerting:
+    name: test-missing-metrics-dynamic
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

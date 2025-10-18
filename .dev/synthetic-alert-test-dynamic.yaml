@@ -1,0 +1,25 @@
+# Test SLO - Synthetic Alert Testing (Dynamic)
+# Used for alert firing validation with synthetic metrics
+# 1d window gives ~2.1min alert windows for faster testing
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: synthetic-alert-test-dynamic
+  namespace: monitoring
+  labels:
+    pyrra.dev/team: testing
+spec:
+  target: "95"
+  window: 1d
+  description: "Dynamic burn rate SLO for synthetic alert testing - 1d window gives ~2.1min alert windows"
+  indicator:
+    ratio:
+      errors:
+        metric: synthetic_test_requests_error_total{service="synthetic-alert-test"}
+      total:
+        metric: synthetic_test_requests_total{service="synthetic-alert-test"}
+  alerting:
+    name: SyntheticAlertTestDynamic
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

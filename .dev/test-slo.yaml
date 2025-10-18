@@ -1,0 +1,22 @@
+# Test SLO - Basic Dynamic Burn Rate Test
+# Used for initial dynamic burn rate testing
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: test-slo
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  target: "99"
+  window: 30d
+  indicator:
+    ratio:
+      errors:
+        metric: prometheus_http_requests_total{code=~'5..'}
+      total:
+        metric: prometheus_http_requests_total
+  alerting:
+    burnRateType: dynamic
+    burnrates: true
+    absent: true

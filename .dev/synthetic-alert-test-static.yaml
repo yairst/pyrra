@@ -1,0 +1,25 @@
+# Test SLO - Synthetic Alert Testing (Static)
+# Used for alert firing validation comparison with static burn rate
+# 1d window gives ~2.1min alert windows for faster testing
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: synthetic-alert-test-static
+  namespace: monitoring
+  labels:
+    pyrra.dev/team: testing
+spec:
+  target: "95"
+  window: 1d
+  description: "Static burn rate SLO for synthetic alert testing comparison - 1d window gives ~2.1min alert windows"
+  indicator:
+    ratio:
+      errors:
+        metric: synthetic_test_requests_error_total{service="synthetic-alert-test"}
+      total:
+        metric: synthetic_test_requests_total{service="synthetic-alert-test"}
+  alerting:
+    name: SyntheticAlertTestStatic
+    burnRateType: static
+    burnrates: true
+    absent: true
