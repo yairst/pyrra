@@ -692,9 +692,6 @@ This implementation plan breaks down the remaining work to complete the dynamic 
 
 - [x] 8.5 Update production documentation (keep concise and proportional)
 
-
-
-
   - **Review existing READMEs**: Examine current README.md and other production docs in upstream Pyrra
   - **Keep updates minimal and proportional**: Dynamic burn rate is ONE feature among many - don't overshadow existing content
   - **Identify documentation gaps**: Determine what needs to be added vs edited:
@@ -764,8 +761,6 @@ This implementation plan breaks down the remaining work to complete the dynamic 
 
 - [x] 8.6 Create pull request description and evidence
 
-
-
   - **Write PR description**: Create comprehensive pull request description including:
     - Feature overview and motivation (reference "Error Budget is All You Need" blog series)
     - Implementation summary (backend, API, UI changes)
@@ -791,9 +786,11 @@ This implementation plan breaks down the remaining work to complete the dynamic 
 **Note**: Task 7.13 already completed comprehensive regression testing with zero regressions found. These tasks are for final verification only.
 
 **IMPORTANT - Branch Workflow**:
+
 - **Current branch**: `dev-tools-and-docs` (has all .dev-docs, .kiro, cmd/, scripts/ for reference)
 - **PR branch**: `add-dynamic-burn-rate` (clean, ready for upstream - no dev files)
-- **Workflow**: 
+- **Workflow**:
+
   1. Work on validation tasks in `dev-tools-and-docs` branch (access to all docs and tools)
   2. If any core files need changes (slo/, ui/, proto/, etc.), commit them to BOTH branches:
      - First commit to `dev-tools-and-docs` (current branch)
@@ -804,12 +801,6 @@ This implementation plan breaks down the remaining work to complete the dynamic 
 - [ ] 9. Perform final validation checks before upstream contribution
 
 - [x] 9.1 Final regression verification
-
-
-
-
-
-
 
   - **Review Task 7.13 results**: Verify comprehensive regression testing completed successfully
   - **Spot-check key scenarios**: Quick validation of critical functionality:
@@ -822,12 +813,6 @@ This implementation plan breaks down the remaining work to complete the dynamic 
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
 - [x] 9.2 Code quality and standards review
-
-
-
-
-
-
 
   - **Code style consistency**: Ensure code follows Pyrra project conventions
   - **Remove debug code**: Clean up any console.log, debug flags, or temporary code
@@ -843,8 +828,6 @@ This implementation plan breaks down the remaining work to complete the dynamic 
   - _Requirements: 6.5_
 
 - [x] 9.3 Final production validation
-
-
 
 
   - **Branch**: Work in `dev-tools-and-docs` (has validation tools in cmd/)
@@ -866,12 +849,14 @@ This implementation plan breaks down the remaining work to complete the dynamic 
     - Re-run tests in both branches to verify
   - _Requirements: 5.5, 6.5_
 
-- [ ] 9.4 Prepare for upstream submission
+- [-] 9.4 Prepare for upstream submission
+
+
 
   - **Switch to PR branch**: `git checkout add-dynamic-burn-rate`
   - **Verify branch is clean**: Ensure no dev files (.dev-docs, .kiro, cmd/, scripts/) in PR branch
   - **Review commit history**: Check if commits need squashing/organizing for clean history
-  - **Final build verification**: 
+  - **Final build verification**:
     - Run `go build -o pyrra .` (backend)
     - Run `cd ui && npm run build` (frontend)
     - Run `go test ./...` (all tests)
