@@ -67,7 +67,7 @@ func main() {
 
 	for _, slo := range testSLOs {
 		log.Printf("\n=== Validating SLO: %s (%s, %s) ===", slo.name, slo.indicatorType, slo.burnRateType)
-		
+
 		// Test 1: Check PrometheusRule exists
 		totalTests++
 		log.Printf("\n[Test 1] Checking PrometheusRule exists...")
@@ -78,7 +78,6 @@ func main() {
 			Resource("prometheusrules").
 			Name(slo.name).
 			DoRaw(ctx)
-		
 		if err != nil {
 			log.Printf("❌ FAIL: PrometheusRule not found: %v", err)
 			failedTests++
@@ -103,8 +102,8 @@ func main() {
 			for _, rule := range group.Rules {
 				switch r := rule.(type) {
 				case v1.RecordingRule:
-					if strings.Contains(r.Name, slo.name) || 
-					   (r.Labels != nil && string(r.Labels["slo"]) == slo.name) {
+					if strings.Contains(r.Name, slo.name) ||
+						(r.Labels != nil && string(r.Labels["slo"]) == slo.name) {
 						foundRecordingRules = true
 						recordingRuleCount++
 					}
@@ -152,7 +151,7 @@ func main() {
 		if slo.burnRateType == "dynamic" && len(alertExpressions) > 0 {
 			totalTests++
 			log.Printf("\n[Test 4] Validating alert expressions reference recording rules...")
-			
+
 			allUseRecordingRules := true
 			for i, expr := range alertExpressions {
 				// Dynamic alert expressions should reference burnrate recording rules
@@ -175,7 +174,7 @@ func main() {
 		if slo.burnRateType == "dynamic" && len(alertExpressions) > 0 {
 			totalTests++
 			log.Printf("\n[Test 5] Validating dynamic threshold calculation structure...")
-			
+
 			allHaveScalar := true
 			allHaveIncrease := true
 			for i, expr := range alertExpressions {
@@ -201,7 +200,7 @@ func main() {
 		// Test 6: Query recording rules to verify they return data
 		totalTests++
 		log.Printf("\n[Test 6] Querying recording rules to verify data...")
-		
+
 		// Try to query a burnrate recording rule
 		query := fmt.Sprintf(`{slo="%s",__name__=~".*:burnrate.*"}`, slo.name)
 		result, warnings, err := promAPI.Query(ctx, query, time.Now())
@@ -212,7 +211,7 @@ func main() {
 			if len(warnings) > 0 {
 				log.Printf("⚠️  Warnings: %v", warnings)
 			}
-			
+
 			resultStr := result.String()
 			if strings.Contains(resultStr, "=>") {
 				log.Printf("✅ PASS: Recording rules return data")
@@ -229,7 +228,7 @@ func main() {
 	log.Printf("Total Tests: %d", totalTests)
 	log.Printf("✅ Passed: %d", passedTests)
 	log.Printf("❌ Failed: %d", failedTests)
-	
+
 	if failedTests == 0 {
 		log.Printf("\n🎉 All tests passed!")
 	} else {

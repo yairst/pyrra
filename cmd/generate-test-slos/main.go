@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// Create output directory
-	if err := os.MkdirAll(*outputDir, 0755); err != nil {
+	if err := os.MkdirAll(*outputDir, 0o755); err != nil {
 		fmt.Printf("Error creating output directory: %v\n", err)
 		os.Exit(1)
 	}
@@ -109,7 +109,7 @@ spec:
 %s
 `, name, namespace, target, window, index+1, indicatorType, window, indicatorYAML)
 
-	return os.WriteFile(filename, []byte(yaml), 0644)
+	return os.WriteFile(filename, []byte(yaml), 0o644)
 }
 
 func generateStaticSLO(name, namespace, filename string, index int) error {
@@ -154,5 +154,5 @@ spec:
 %s
 `, name, namespace, target, window, index+1, indicatorType, window, indicatorYAML)
 
-	return os.WriteFile(filename, []byte(yaml), 0644)
+	return os.WriteFile(filename, []byte(yaml), 0o644)
 }

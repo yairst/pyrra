@@ -47,7 +47,7 @@ type ValidationResult struct {
 
 func main() {
 	log.Println("=== Recording Rules Validation for All Indicator Types ===")
-	
+
 	// Define test cases for all indicator types and burn rate types
 	testCases := []RecordingRuleValidation{
 		// Ratio indicators
@@ -59,7 +59,7 @@ func main() {
 			Description:   "Ratio indicator with dynamic burn rate - 5m burnrate rule",
 		},
 		{
-			SLOName:       "test-static-apiserver", 
+			SLOName:       "test-static-apiserver",
 			IndicatorType: "ratio",
 			BurnRateType:  "static",
 			RuleName:      "apiserver_request:burnrate5m",
@@ -69,7 +69,7 @@ func main() {
 		{
 			SLOName:       "test-latency-dynamic",
 			IndicatorType: "latency",
-			BurnRateType:  "dynamic", 
+			BurnRateType:  "dynamic",
 			RuleName:      "prometheus_http_request_duration_seconds:burnrate5m",
 			Description:   "Latency indicator with dynamic burn rate - 5m burnrate rule",
 		},
@@ -77,7 +77,7 @@ func main() {
 			SLOName:       "test-latency-static",
 			IndicatorType: "latency",
 			BurnRateType:  "static",
-			RuleName:      "prometheus_http_request_duration_seconds:burnrate5m", 
+			RuleName:      "prometheus_http_request_duration_seconds:burnrate5m",
 			Description:   "Latency indicator with static burn rate - 5m burnrate rule",
 		},
 		// LatencyNative indicators
@@ -88,7 +88,7 @@ func main() {
 			RuleName:      "connect_server_requests_duration_seconds:burnrate5m",
 			Description:   "LatencyNative indicator with dynamic burn rate - 5m burnrate rule",
 		},
-		// BoolGauge indicators  
+		// BoolGauge indicators
 		{
 			SLOName:       "test-bool-gauge-dynamic",
 			IndicatorType: "boolGauge",
@@ -100,22 +100,22 @@ func main() {
 
 	// Run validation tests
 	results := make([]ValidationResult, 0, len(testCases))
-	
+
 	for _, test := range testCases {
 		log.Printf("Testing: %s (%s %s)", test.Description, test.IndicatorType, test.BurnRateType)
 		result := validateRecordingRule(test)
 		results = append(results, result)
-		
+
 		if result.Success {
 			log.Printf("✅ PASS: %s - Found %d metrics in %v", test.RuleName, result.MetricCount, result.QueryTime)
 		} else {
 			log.Printf("❌ FAIL: %s - %s", test.RuleName, result.Error)
 		}
 	}
-	
+
 	// Print summary
 	printValidationSummary(results)
-	
+
 	// Additional validation tests
 	log.Println("\n=== Additional Validation Tests ===")
 	validateQueryEfficiency()
@@ -128,31 +128,31 @@ func validateRecordingRule(test RecordingRuleValidation) ValidationResult {
 		Test:    test,
 		Success: false,
 	}
-	
+
 	// Query Prometheus for the recording rule
 	query := fmt.Sprintf(`%s{slo="%s"}`, test.RuleName, test.SLOName)
-	
+
 	startTime := time.Now()
 	prometheusResult, err := queryPrometheus(query)
 	result.QueryTime = time.Since(startTime)
-	
+
 	if err != nil {
 		result.Error = fmt.Sprintf("Failed to query Prometheus: %v", err)
 		return result
 	}
-	
+
 	if prometheusResult.Status != "success" {
 		result.Error = fmt.Sprintf("Prometheus query failed: %s", prometheusResult.Status)
 		return result
 	}
-	
+
 	result.MetricCount = len(prometheusResult.Data.Result)
-	
+
 	if result.MetricCount == 0 {
 		result.Error = "No metrics found for recording rule"
 		return result
 	}
-	
+
 	// Validate that the recording rule has proper labels
 	for _, metric := range prometheusResult.Data.Result {
 		// Check for required labels
@@ -160,80 +160,80 @@ func validateRecordingRule(test RecordingRuleValidation) ValidationResult {
 			result.Error = fmt.Sprintf("Missing or incorrect 'slo' label: expected %s, got %s", test.SLOName, sloLabel)
 			return result
 		}
-		
+
 		// Validate metric value is numeric and reasonable
 		if len(metric.Value) != 2 {
 			result.Error = "Invalid metric value format"
 			return result
 		}
-		
+
 		// Check that the value is a valid number (not NaN or Inf)
 		valueStr, ok := metric.Value[1].(string)
 		if !ok {
 			result.Error = "Metric value is not a string"
 			return result
 		}
-		
+
 		if valueStr == "NaN" || valueStr == "+Inf" || valueStr == "-Inf" {
 			result.Error = fmt.Sprintf("Invalid metric value: %s", valueStr)
 			return result
 		}
 	}
-	
+
 	result.Success = true
 	return result
 }
 
 func queryPrometheus(query string) (*PrometheusQueryResult, error) {
 	prometheusURL := "http://localhost:9090"
-	
+
 	// URL encode the query
 	encodedQuery := url.QueryEscape(query)
 	fullURL := fmt.Sprintf("%s/api/v1/query?query=%s", prometheusURL, encodedQuery)
-	
+
 	resp, err := http.Get(fullURL)
 	if err != nil {
 		return nil, fmt.Errorf("HTTP request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	
+
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
-	
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read response: %v", err)
 	}
-	
+
 	var result PrometheusQueryResult
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("Failed to parse JSON: %v", err)
 	}
-	
+
 	return &result, nil
 }
 
 func printValidationSummary(results []ValidationResult) {
 	log.Println("\n=== Validation Summary ===")
-	
+
 	passed := 0
 	failed := 0
-	
+
 	// Group results by indicator type
 	byIndicator := make(map[string][]ValidationResult)
 	for _, result := range results {
 		indicator := result.Test.IndicatorType
 		byIndicator[indicator] = append(byIndicator[indicator], result)
 	}
-	
+
 	// Sort indicator types for consistent output
 	indicators := make([]string, 0, len(byIndicator))
 	for indicator := range byIndicator {
 		indicators = append(indicators, indicator)
 	}
 	sort.Strings(indicators)
-	
+
 	for _, indicator := range indicators {
 		log.Printf("\n%s Indicators:", strings.Title(indicator))
 		for _, result := range byIndicator[indicator] {
@@ -244,13 +244,13 @@ func printValidationSummary(results []ValidationResult) {
 			} else {
 				failed++
 			}
-			
-			log.Printf("  %s %s (%s): %s", 
-				status, 
+
+			log.Printf("  %s %s (%s): %s",
+				status,
 				result.Test.BurnRateType,
 				result.Test.SLOName,
 				result.Test.RuleName)
-			
+
 			if !result.Success {
 				log.Printf("    Error: %s", result.Error)
 			} else {
@@ -258,12 +258,12 @@ func printValidationSummary(results []ValidationResult) {
 			}
 		}
 	}
-	
+
 	log.Printf("\n=== Final Results ===")
 	log.Printf("Total Tests: %d", len(results))
 	log.Printf("Passed: %d", passed)
 	log.Printf("Failed: %d", failed)
-	
+
 	if failed > 0 {
 		log.Printf("❌ VALIDATION FAILED - %d tests failed", failed)
 		os.Exit(1)
@@ -274,40 +274,40 @@ func printValidationSummary(results []ValidationResult) {
 
 func validateQueryEfficiency() {
 	log.Println("Testing query efficiency...")
-	
+
 	// Test that recording rules use efficient aggregations
 	testQueries := []struct {
-		name  string
-		query string
+		name    string
+		query   string
 		maxTime time.Duration
 	}{
 		{
-			name:  "Burnrate recording rule query",
-			query: `apiserver_request:burnrate5m{slo="test-dynamic-apiserver"}`,
+			name:    "Burnrate recording rule query",
+			query:   `apiserver_request:burnrate5m{slo="test-dynamic-apiserver"}`,
 			maxTime: 100 * time.Millisecond,
 		},
 		{
-			name:  "Availability recording rule query", 
-			query: `pyrra_availability{slo="test-dynamic-apiserver"}`,
+			name:    "Availability recording rule query",
+			query:   `pyrra_availability{slo="test-dynamic-apiserver"}`,
 			maxTime: 100 * time.Millisecond,
 		},
 		{
-			name:  "Request rate recording rule query",
-			query: `pyrra_requests:rate5m{slo="test-dynamic-apiserver"}`,
+			name:    "Request rate recording rule query",
+			query:   `pyrra_requests:rate5m{slo="test-dynamic-apiserver"}`,
 			maxTime: 100 * time.Millisecond,
 		},
 	}
-	
+
 	for _, test := range testQueries {
 		startTime := time.Now()
 		result, err := queryPrometheus(test.query)
 		queryTime := time.Since(startTime)
-		
+
 		if err != nil {
 			log.Printf("❌ %s: Query failed - %v", test.name, err)
 			continue
 		}
-		
+
 		if queryTime > test.maxTime {
 			log.Printf("⚠️  %s: Query took %v (expected < %v)", test.name, queryTime, test.maxTime)
 		} else {
@@ -318,36 +318,36 @@ func validateQueryEfficiency() {
 
 func validateLabelHandling() {
 	log.Println("Testing label handling...")
-	
+
 	// Test that recording rules have proper label propagation
 	query := `{__name__=~".*:burnrate.*",slo="test-dynamic-apiserver"}`
-	
+
 	result, err := queryPrometheus(query)
 	if err != nil {
 		log.Printf("❌ Label validation query failed: %v", err)
 		return
 	}
-	
+
 	if len(result.Data.Result) == 0 {
 		log.Printf("❌ No burnrate metrics found for label validation")
 		return
 	}
-	
+
 	// Check that all burnrate metrics have consistent labels
 	expectedLabels := []string{"slo"}
 	labelCounts := make(map[string]int)
-	
+
 	for _, metric := range result.Data.Result {
 		for label := range metric.Metric {
 			labelCounts[label]++
 		}
 	}
-	
+
 	log.Printf("Label distribution across %d burnrate metrics:", len(result.Data.Result))
 	for label, count := range labelCounts {
 		log.Printf("  %s: %d metrics", label, count)
 	}
-	
+
 	// Verify required labels are present
 	for _, requiredLabel := range expectedLabels {
 		if count, exists := labelCounts[requiredLabel]; !exists {
@@ -362,11 +362,11 @@ func validateLabelHandling() {
 
 func validateTimeWindows() {
 	log.Println("Testing time window scaling...")
-	
+
 	// Test different SLO window sizes and verify recording rules scale appropriately
 	testCases := []struct {
-		sloName string
-		window  string
+		sloName       string
+		window        string
 		expectedRules []string
 	}{
 		{
@@ -374,25 +374,24 @@ func validateTimeWindows() {
 			window:  "30d",
 			expectedRules: []string{
 				"apiserver_request:burnrate5m",
-				"apiserver_request:burnrate30m", 
+				"apiserver_request:burnrate30m",
 				"apiserver_request:burnrate2h",
 				"apiserver_request:burnrate6h26m",
 			},
 		},
 	}
-	
+
 	for _, test := range testCases {
 		log.Printf("Testing SLO %s with %s window:", test.sloName, test.window)
-		
+
 		for _, ruleName := range test.expectedRules {
 			query := fmt.Sprintf(`%s{slo="%s"}`, ruleName, test.sloName)
 			result, err := queryPrometheus(query)
-			
 			if err != nil {
 				log.Printf("❌ %s: Query failed - %v", ruleName, err)
 				continue
 			}
-			
+
 			if len(result.Data.Result) == 0 {
 				log.Printf("❌ %s: No metrics found", ruleName)
 			} else {

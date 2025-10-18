@@ -33,7 +33,7 @@ func NewPrometheusAlertsClient(promClient api.Client) *PrometheusAlertsClient {
 type PrometheusAlert struct {
 	Labels      map[string]string `json:"labels"`
 	Annotations map[string]string `json:"annotations"`
-	State       string            `json:"state"`       // inactive, pending, firing
+	State       string            `json:"state"` // inactive, pending, firing
 	ActiveAt    time.Time         `json:"activeAt"`
 	Value       string            `json:"value"`
 }
@@ -168,10 +168,10 @@ func (c *PrometheusAlertsClient) PrintAlertSummary(ctx context.Context, serviceN
 		default:
 			emoji = "❓"
 		}
-		
+
 		alertname := alert.Labels["alertname"]
 		slo := alert.Labels["slo"]
-		fmt.Printf("  %s %s [%s] - SLO: %s - Active: %v\n", 
+		fmt.Printf("  %s %s [%s] - SLO: %s - Active: %v\n",
 			emoji, alertname, alert.State, slo, alert.ActiveAt.Format("15:04:05"))
 	}
 	fmt.Printf("=====================================\n")

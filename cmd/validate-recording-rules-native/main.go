@@ -35,22 +35,22 @@ func main() {
 		log.Printf("❌ Failed to query native histogram metrics: %v", err)
 		return
 	}
-	
+
 	if len(result.Data.Result) == 0 {
 		log.Printf("❌ No native histogram metrics found. Is Pyrra running and generating metrics?")
 		return
 	}
-	
+
 	log.Printf("✅ Found %d native histogram metrics", len(result.Data.Result))
-	
+
 	// Show sample metric structure
 	if len(result.Data.Result) > 0 {
 		log.Printf("   Sample metric: %+v", result.Data.Result[0].Metric)
 	}
-	
+
 	// Test 2: Check LatencyNative recording rules
 	log.Println("\n2. Testing LatencyNative recording rules...")
-	
+
 	tests := []struct {
 		name  string
 		query string
@@ -72,33 +72,33 @@ func main() {
 			desc:  "Increase recording rules for LatencyNative",
 		},
 	}
-	
+
 	allPassed := true
-	
+
 	for _, test := range tests {
 		log.Printf("\nTesting: %s", test.name)
 		log.Printf("Query: %s", test.query)
-		
+
 		result, err := queryPrometheus(test.query)
 		if err != nil {
 			log.Printf("❌ Query failed: %v", err)
 			allPassed = false
 			continue
 		}
-		
+
 		if len(result.Data.Result) == 0 {
 			log.Printf("❌ No metrics found")
 			allPassed = false
 			continue
 		}
-		
+
 		log.Printf("✅ Found %d metrics", len(result.Data.Result))
-		
+
 		// Analyze values
 		validValues := 0
 		nanValues := 0
 		zeroValues := 0
-		
+
 		for _, metric := range result.Data.Result {
 			if len(metric.Value) == 2 {
 				if valueStr, ok := metric.Value[1].(string); ok {
@@ -113,23 +113,23 @@ func main() {
 				}
 			}
 		}
-		
+
 		log.Printf("   Values: %d valid, %d zero, %d NaN", validValues, zeroValues, nanValues)
-		
+
 		// For LatencyNative, NaN values might be expected if there's insufficient data
 		if nanValues > 0 {
 			log.Printf("   ⚠️  NaN values detected - this may indicate insufficient histogram data")
 		}
 	}
-	
+
 	// Test 3: Validate recording rule structure in Kubernetes
 	log.Println("\n3. Validating PrometheusRule structure...")
 	validatePrometheusRule()
-	
+
 	// Test 4: Check Pyrra API integration
 	log.Println("\n4. Testing Pyrra API integration...")
 	testPyrraAPI()
-	
+
 	if allPassed {
 		log.Println("\n🎉 LatencyNative recording rules validation PASSED")
 		log.Println("\nNext step: Please disable native histograms in Prometheus and restart")
@@ -141,31 +141,31 @@ func main() {
 
 func queryPrometheus(query string) (*PrometheusQueryResult, error) {
 	prometheusURL := "http://localhost:9090"
-	
+
 	// URL encode the query
 	encodedQuery := url.QueryEscape(query)
 	fullURL := fmt.Sprintf("%s/api/v1/query?query=%s", prometheusURL, encodedQuery)
-	
+
 	resp, err := http.Get(fullURL)
 	if err != nil {
 		return nil, fmt.Errorf("HTTP request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	
+
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
-	
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read response: %v", err)
 	}
-	
+
 	var result PrometheusQueryResult
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("Failed to parse JSON: %v", err)
 	}
-	
+
 	return &result, nil
 }
 
@@ -189,21 +189,21 @@ func testPyrraAPI() {
 			url:  "http://localhost:9099/objectives.v1alpha1.ObjectiveService/List",
 		},
 		{
-			name: "Kubernetes Backend Service", 
+			name: "Kubernetes Backend Service",
 			url:  "http://localhost:9444/objectives.v1alpha1.ObjectiveBackendService/List",
 		},
 	}
-	
+
 	for _, endpoint := range endpoints {
 		log.Printf("   Testing %s...", endpoint.name)
-		
+
 		resp, err := http.Post(endpoint.url, "application/json", strings.NewReader("{}"))
 		if err != nil {
 			log.Printf("   ❌ %s failed: %v", endpoint.name, err)
 			continue
 		}
 		defer resp.Body.Close()
-		
+
 		if resp.StatusCode == http.StatusOK {
 			log.Printf("   ✅ %s responding", endpoint.name)
 		} else {
